@@ -1,0 +1,303 @@
+rules_version = '2';
+
+// SakayNa Firestore rules.
+// Paste into Firebase console > Firestore Database > Rules > Publish.
+// Anything not matched below is denied.
+//
+// Known limitations (fixed with Cloud Functions in the final project):
+// - Rating counters (ratingSum / ratingCount on users and vehicles) can be
+//   changed by any other signed-in user so renters and owners can rate each
+//   other. Nobody can change their own.
+// - Prices and totals in a booking are calculated on the phone.
+// - Anyone signed in can send a notification to any user (always under their
+//   own uid in createdBy).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function onlyRatingCountersChange() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['ratingSum', 'ratingCount']);
+    }
+
+    function ratingCountersUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+                .hasAny(['ratingSum', 'ratingCount']);
+    }
+
+    // ---------- Users ----------
+    // Public profile: any signed-in user can read it. Only the user can create,
+    // edit, or delete it; phone number and role never change.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if isSelf(uid)
+                    && request.resource.data.phone is string
+                    && request.resource.data.role in ['renter', 'owner']
+                    && !request.resource.data.keys().hasAny(['ratingSum', 'ratingCount']);
+      allow update: if (isSelf(uid)
+                        && request.resource.data.phone == resource.data.phone
+                        && request.resource.data.role == resource.data.role
+                        && ratingCountersUnchanged())
+                    || (signedIn() && !isSelf(uid) && onlyRatingCountersChange());
+      allow delete: if isSelf(uid);
+
+      // License, government ID, and OR/CR photos: only the user.
+      match /private/{docId} {
+        allow read, write: if isSelf(uid);
+      }
+
+      // Payout QR: renters need to see it to pay.
+      match /photos/{photoId} {
+        allow read: if signedIn();
+        allow write: if isSelf(uid);
+      }
+
+      // In-app notifications. Anyone signed in can send one (as themselves);
+      // only the user can read, mark read, or delete them.
+      match /notifications/{notificationId} {
+        allow read, update, delete: if isSelf(uid);
+        allow create: if signedIn()
+                      && request.resource.data.createdBy == request.auth.uid
+                      && request.resource.data.message is string
+                      && request.resource.data.message.size() <= 500;
+      }
+    }
+
+    // ---------- Vehicles ----------
+    match /vehicles/{vehicleId} {
+      function vehiclePath() {
+        return /databases/$(database)/documents/vehicles/$(vehicleId);
+      }
+
+      // Photos for a new listing are uploaded before the vehicle doc exists.
+      function isVehicleOwnerOrNew() {
+        return !exists(vehiclePath())
+            || get(vehiclePath()).data.ownerId == request.auth.uid;
+      }
+
+      allow read: if signedIn();
+      allow create: if signedIn()
+                    && request.resource.data.ownerId == request.auth.uid
+                    && request.resource.data.get('ratingSum', 0) == 0
+                    && request.resource.data.get('ratingCount', 0) == 0;
+      allow update: if signedIn() && (
+                      (resource.data.ownerId == request.auth.uid
+                        && request.resource.data.ownerId == resource.data.ownerId
+                        && ratingCountersUnchanged())
+                      || (resource.data.ownerId != request.auth.uid
+                          && onlyRatingCountersChange())
+                    );
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+
+      match /photos/{photoId} {
+        allow read: if signedIn();
+        allow create: if signedIn()
+                      && request.resource.data.ownerId == request.auth.uid
+                      && isVehicleOwnerOrNew();
+        allow update, delete: if signedIn()
+                              && resource.data.ownerId == request.auth.uid;
+      }
+
+      // Review id = booking id, so a booking can be reviewed once, and only by
+      // its renter after the trip is Completed.
+      match /reviews/{reviewId} {
+        function reviewedBooking() {
+          return get(/databases/$(database)/documents/bookings/$(reviewId)).data;
+        }
+        allow read: if signedIn();
+        allow create: if signedIn()
+                      && request.resource.data.renterId == request.auth.uid
+                      && request.resource.data.stars is int
+                      && request.resource.data.stars >= 1
+                      && request.resource.data.stars <= 5
+                      && reviewedBooking().renterId == request.auth.uid
+                      && reviewedBooking().vehicleId == vehicleId
+                      && reviewedBooking().status == 'Completed';
+      }
+
+      // One doc per taken day (id = yyyy-MM-dd). "create" only works if the doc
+      // doesn't exist yet, which is what blocks double booking.
+      // "booking" days must point to a real booking for this vehicle (getAfter
+      // also sees a booking created in the same transaction). "blocked" days
+      // can only be added by the vehicle owner.
+      match /bookedDays/{day} {
+        function linkedBooking() {
+          return getAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data;
+        }
+        function validDay() {
+          let data = request.resource.data;
+          return data.ownerId == get(vehiclePath()).data.ownerId
+              && data.vehicleId == vehicleId
+              && ((data.type == 'blocked'
+                    && data.ownerId == request.auth.uid)
+                  || (data.type == 'booking'
+                    && linkedBooking().vehicleId == vehicleId
+                    && linkedBooking().renterId == data.renterId
+                    && (data.renterId == request.auth.uid
+                        || data.ownerId == request.auth.uid)));
+        }
+
+        allow read: if signedIn();
+        allow create: if signedIn() && validDay();
+        allow update: if signedIn() && validDay()
+                      && resource.data.bookingId == request.resource.data.bookingId;
+        allow delete: if signedIn()
+                      && (resource.data.renterId == request.auth.uid
+                          || resource.data.ownerId == request.auth.uid);
+      }
+    }
+
+    // "Available on my dates" reads bookedDays across all vehicles.
+    match /{path=**}/bookedDays/{day} {
+      allow read: if signedIn();
+    }
+
+    // ---------- Bookings ----------
+    match /bookings/{bookingId} {
+      function bookingData() {
+        return get(/databases/$(database)/documents/bookings/$(bookingId)).data;
+      }
+      function isParticipant() {
+        return signedIn()
+            && (bookingData().renterId == request.auth.uid
+                || bookingData().ownerId == request.auth.uid);
+      }
+      function changedKeys() {
+        return request.resource.data.diff(resource.data).affectedKeys();
+      }
+      function statusBecomes(allowed) {
+        return !('status' in changedKeys()) || request.resource.data.status in allowed;
+      }
+      // Status can only move forward: Pending -> Approved/Declined/Cancelled,
+      // Approved -> Ongoing/Cancelled, Ongoing -> Completed.
+      function validStatusStep() {
+        let from = resource.data.status;
+        let to = request.resource.data.status;
+        return !('status' in changedKeys())
+            || (from == 'Pending' && to in ['Approved', 'Declined', 'Cancelled'])
+            || (from == 'Approved' && to in ['Ongoing', 'Cancelled'])
+            || (from == 'Ongoing' && to == 'Completed');
+      }
+
+      allow read: if signedIn()
+                  && (resource.data.renterId == request.auth.uid
+                      || resource.data.ownerId == request.auth.uid);
+
+      // Renter creates a Pending booking for a real vehicle and its real owner.
+      allow create: if signedIn()
+                    && request.resource.data.renterId == request.auth.uid
+                    && request.resource.data.status == 'Pending'
+                    && request.resource.data.ownerId ==
+                       get(/databases/$(database)/documents/vehicles/$(request.resource.data.vehicleId)).data.ownerId;
+
+      // Renter: cancel, payment proof, extension requests, ratings.
+      // Owner: approve/decline/pickup/return/cancel, payment status, deposit
+      // deductions, extension decisions, renter rating.
+      allow update: if (signedIn()
+                        && resource.data.renterId == request.auth.uid
+                        && changedKeys().hasOnly([
+                             'status', 'extensions', 'paymentReference', 'paymentProofFile',
+                             'paymentStatus', 'paymentRejectReason', 'vehicleRating',
+                             'ownerRating', 'ratingComment', 'renterName', 'renterContact',
+                             'renterLicenseRef'])
+                        && statusBecomes(['Cancelled'])
+                        && validStatusStep()
+                        && (!('paymentStatus' in changedKeys())
+                            || request.resource.data.paymentStatus == 'Proof Submitted'))
+                    || (signedIn()
+                        && resource.data.ownerId == request.auth.uid
+                        && changedKeys().hasOnly([
+                             'status', 'location', 'pickupTime', 'ownerContact',
+                             'pickupPINVerified', 'paymentStatus', 'paymentRejectReason',
+                             'pickupPhotos', 'pickupNote', 'pickupFuel', 'returnPhotos',
+                             'returnNote', 'returnFuel', 'lateFee', 'depositReturned',
+                             'depositRefundAmount', 'deductions', 'extensions', 'endDate',
+                             'days', 'totalPrice', 'renterRating', 'ratingComment',
+                             'cancelReason'])
+                        && statusBecomes(['Approved', 'Declined', 'Ongoing', 'Completed', 'Cancelled'])
+                        && validStatusStep());
+      allow delete: if false;
+
+      // Checklist, payment proof, deduction, and license copy photos.
+      match /photos/{photoId} {
+        allow read: if isParticipant();
+        allow create: if isParticipant()
+                      && request.resource.data.ownerId == request.auth.uid;
+        allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+      }
+
+      // The plain pickup PIN: renter only. The owner only sees pickupPINHash.
+      match /private/{docId} {
+        allow read, write: if signedIn() && bookingData().renterId == request.auth.uid;
+      }
+    }
+
+    // ---------- Chat ----------
+    // Conversation id = renterId_ownerId_vehicleId. Only the two participants
+    // can see it. Each user can only add or remove their own uid in blockedBy.
+    match /conversations/{conversationId} {
+      function conversationPath() {
+        return /databases/$(database)/documents/conversations/$(conversationId);
+      }
+      function isMember(data) {
+        return signedIn() && request.auth.uid in data.participantIds;
+      }
+      function othersInBlockedBy(data) {
+        return data.get('blockedBy', []).removeAll([request.auth.uid]);
+      }
+
+      // get is allowed on a missing doc so the app can check before creating it.
+      allow get: if signedIn() && (resource == null || isMember(resource.data));
+      allow list: if isMember(resource.data);
+
+      allow create: if isMember(request.resource.data)
+                    && request.resource.data.participantIds ==
+                       [request.resource.data.renterId, request.resource.data.ownerId]
+                    && conversationId == request.resource.data.renterId + '_'
+                       + request.resource.data.ownerId + '_' + request.resource.data.vehicleId
+                    && request.resource.data.ownerId ==
+                       get(/databases/$(database)/documents/vehicles/$(request.resource.data.vehicleId)).data.ownerId
+                    && request.resource.data.get('blockedBy', []).size() == 0;
+
+      allow update: if isMember(resource.data)
+                    && request.resource.data.participantIds == resource.data.participantIds
+                    && request.resource.data.renterId == resource.data.renterId
+                    && request.resource.data.ownerId == resource.data.ownerId
+                    && request.resource.data.vehicleId == resource.data.vehicleId
+                    && othersInBlockedBy(request.resource.data) == othersInBlockedBy(resource.data);
+
+      allow delete: if isMember(resource.data);
+
+      // Messages can only be added (never edited), and not while either user
+      // has blocked the other. getAfter sees the conversation as it will be
+      // after the same batch, so the very first message also works.
+      match /messages/{messageId} {
+        allow read, delete: if signedIn()
+                            && request.auth.uid in get(conversationPath()).data.participantIds;
+        allow create: if signedIn()
+                      && request.resource.data.senderId == request.auth.uid
+                      && request.resource.data.text is string
+                      && request.resource.data.text.size() > 0
+                      && request.resource.data.text.size() <= 2000
+                      && request.auth.uid in getAfter(conversationPath()).data.participantIds
+                      && getAfter(conversationPath()).data.get('blockedBy', []).size() == 0;
+      }
+    }
+
+    // ---------- Reports ----------
+    // Write-only: users can file a report, nobody can read them from the app.
+    // Reviewed in the Firebase console.
+    match /reports/{reportId} {
+      allow create: if signedIn()
+                    && request.resource.data.reporterId == request.auth.uid
+                    && request.resource.data.reason is string;
+    }
+  }
+}
