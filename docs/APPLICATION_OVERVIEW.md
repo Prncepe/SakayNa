@@ -65,46 +65,67 @@ All live data (accounts, vehicles, bookings, chat, and notifications) is stored 
 
 ## Screenshots
 
-Full feature set captured from the running SwiftUI simulator (`docs/screenshots/`):
+Folder: **`docs/screenshots/`** (numbered in app-flow order for PDF).
 
-| # | File | Feature |
+### A. Auth
+| # | File | Screen |
 |---|---|---|
-| 01 | `01-welcome.png` | Welcome / brand intro |
-| 02 | `02-login.png` | Login (phone + role) |
-| 03 | `03-signup.png` | Create account + Terms |
-| 04 | `04-renter-home.png` | Renter home browse |
+| 01 | `01-welcome.png` | Welcome / get started |
+| 02 | `02-signup.png` | Create account |
+| 03 | `03-login.png` | Log in |
+
+### B. Renter — find & book
+| # | File | Screen |
+|---|---|---|
+| 04 | `04-renter-home.png` | Home browse |
 | 05 | `05-all-vehicles.png` | All vehicles / filters |
-| 06 | `06-vehicle-detail.png` | Vehicle detail + gallery |
-| 07 | `07-booking.png` | Booking form + payment choice |
-| 08 | `08-payment.png` | Payment / proof flow |
-| 09 | `09-confirmation.png` | Booking confirmation |
-| 10 | `10-my-bookings.png` | My bookings list |
-| 11 | `11-trip-tracking.png` | Trip tracking timeline |
-| 12 | `12-receipt.png` | Receipt / PDF |
-| 13 | `13-rate-trip.png` | Rate trip |
-| 14 | `14-messages.png` | Messages inbox |
-| 15 | `15-chat.png` | Chat thread |
-| 16 | `16-notifications.png` | In-app notifications |
-| 17 | `17-profile-renter.png` | Renter profile |
-| 18 | `18-edit-profile.png` | Edit profile |
-| 19 | `19-payment-methods.png` | Payment methods |
-| 20 | `20-license-upload.png` | License / ID upload |
-| 21 | `21-saved-vehicles.png` | Saved / favorites |
+| 06 | `06-vehicle-detail.png` | Vehicle detail |
+| 07 | `07-saved-vehicles.png` | Saved / favorites |
+| 08 | `08-booking.png` | Booking form |
+| 09 | `09-payment.png` | Payment |
+| 10 | `10-confirmation.png` | Confirmation |
+
+### C. Renter — trip
+| # | File | Screen |
+|---|---|---|
+| 11 | `11-my-bookings.png` | My bookings |
+| 12 | `12-trip-tracking.png` | Trip tracking |
+| 13 | `13-receipt.png` | Receipt |
+| 14 | `14-rate-trip.png` | Rate trip |
+
+### D. Renter — chat & alerts
+| # | File | Screen |
+|---|---|---|
+| 15 | `15-messages.png` | Messages inbox |
+| 16 | `16-chat.png` | Chat thread |
+| 17 | `17-notifications.png` | Notifications |
+
+### E. Renter — profile & settings
+| # | File | Screen |
+|---|---|---|
+| 18 | `18-profile-renter.png` | Profile |
+| 19 | `19-edit-profile.png` | Edit profile |
+| 20 | `20-license-upload.png` | License / ID |
+| 21 | `21-payment-methods.png` | Payment methods |
 | 22 | `22-notification-settings.png` | Notification settings |
 | 23 | `23-help.png` | Help |
-| 24 | `24-terms.png` | Terms of use |
-| 25 | `25-privacy.png` | Privacy policy |
+| 24 | `24-terms.png` | Terms |
+| 25 | `25-privacy.png` | Privacy |
 | 26 | `26-about.png` | About |
-| 27 | `27-owner-dashboard.png` | Owner dashboard |
+
+### F. Owner flow
+| # | File | Screen |
+|---|---|---|
+| 27 | `27-owner-dashboard.png` | Dashboard |
 | 28 | `28-add-vehicle.png` | Add vehicle |
 | 29 | `29-edit-vehicle.png` | Edit vehicle |
 | 30 | `30-booking-requests.png` | Booking requests |
-| 31 | `31-owner-messages.png` | Owner messages |
-| 32 | `32-owner-chat.png` | Owner chat |
-| 33 | `33-owner-profile.png` | Owner profile |
-| 34 | `34-verify-account.png` | Owner verification |
-| 35 | `35-owner-payout.png` | Payout methods |
-| 36 | `36-owner-notifications.png` | Owner notifications |
+| 31 | `31-owner-messages.png` | Messages |
+| 32 | `32-owner-chat.png` | Chat |
+| 33 | `33-owner-notifications.png` | Notifications |
+| 34 | `34-owner-profile.png` | Profile |
+| 35 | `35-verify-account.png` | Verify account |
+| 36 | `36-owner-payout.png` | Payout methods |
 
 ## Source code
 

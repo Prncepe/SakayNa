@@ -13,20 +13,24 @@ See [docs/APPLICATION_OVERVIEW.md](docs/APPLICATION_OVERVIEW.md).
 
 ## Screenshots
 
-36 feature screenshots live in [`docs/screenshots/`](docs/screenshots/) (welcome → signup → renter booking/trip/chat → owner dashboard/listings/requests). Full inventory: [APPLICATION_OVERVIEW.md](docs/APPLICATION_OVERVIEW.md#screenshots).
+**Path:** [`docs/screenshots/`](docs/screenshots/) — insert into your PDF in filename order (`01` → `36`).
 
-| Screen | Preview |
+Flow: Welcome → Signup → Login → Browse → Book → Trip → Chat → Profile → Owner dashboard → Listings → Requests.
+
+Full labeled list: [APPLICATION_OVERVIEW.md](docs/APPLICATION_OVERVIEW.md#screenshots).
+
+| Flow step | Preview |
 |---|---|
-| Welcome | ![Welcome](docs/screenshots/01-welcome.png) |
-| Login | ![Login](docs/screenshots/02-login.png) |
-| Signup | ![Signup](docs/screenshots/03-signup.png) |
-| Renter home | ![Renter](docs/screenshots/04-renter-home.png) |
-| Vehicle detail | ![Detail](docs/screenshots/06-vehicle-detail.png) |
-| Trip tracking | ![Trip](docs/screenshots/11-trip-tracking.png) |
-| Chat | ![Chat](docs/screenshots/15-chat.png) |
-| Owner dashboard | ![Owner](docs/screenshots/27-owner-dashboard.png) |
-| Add vehicle | ![Add](docs/screenshots/28-add-vehicle.png) |
-| Booking requests | ![Requests](docs/screenshots/30-booking-requests.png) |
+| 01 Welcome | ![Welcome](docs/screenshots/01-welcome.png) |
+| 02 Signup | ![Signup](docs/screenshots/02-signup.png) |
+| 03 Login | ![Login](docs/screenshots/03-login.png) |
+| 04 Renter home | ![Renter](docs/screenshots/04-renter-home.png) |
+| 06 Vehicle detail | ![Detail](docs/screenshots/06-vehicle-detail.png) |
+| 12 Trip tracking | ![Trip](docs/screenshots/12-trip-tracking.png) |
+| 16 Chat | ![Chat](docs/screenshots/16-chat.png) |
+| 27 Owner dashboard | ![Owner](docs/screenshots/27-owner-dashboard.png) |
+| 28 Add vehicle | ![Add](docs/screenshots/28-add-vehicle.png) |
+| 30 Booking requests | ![Requests](docs/screenshots/30-booking-requests.png) |
 
 ## Demo accounts
 
