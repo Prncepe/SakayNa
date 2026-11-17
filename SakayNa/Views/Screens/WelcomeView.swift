@@ -19,6 +19,8 @@ struct WelcomeView: View {
 
     var body: some View {
         ZStack {
+            palette.canvas.ignoresSafeArea()
+
             // Full-screen intro; stays on the last frame when finished
             if let player {
                 IntroPlayerView(player: player)

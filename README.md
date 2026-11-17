@@ -13,12 +13,20 @@ See [docs/APPLICATION_OVERVIEW.md](docs/APPLICATION_OVERVIEW.md).
 
 ## Screenshots
 
+36 feature screenshots live in [`docs/screenshots/`](docs/screenshots/) (welcome → signup → renter booking/trip/chat → owner dashboard/listings/requests). Full inventory: [APPLICATION_OVERVIEW.md](docs/APPLICATION_OVERVIEW.md#screenshots).
+
 | Screen | Preview |
 |---|---|
 | Welcome | ![Welcome](docs/screenshots/01-welcome.png) |
 | Login | ![Login](docs/screenshots/02-login.png) |
-| Owner dashboard | ![Owner](docs/screenshots/03-owner-dashboard.png) |
+| Signup | ![Signup](docs/screenshots/03-signup.png) |
 | Renter home | ![Renter](docs/screenshots/04-renter-home.png) |
+| Vehicle detail | ![Detail](docs/screenshots/06-vehicle-detail.png) |
+| Trip tracking | ![Trip](docs/screenshots/11-trip-tracking.png) |
+| Chat | ![Chat](docs/screenshots/15-chat.png) |
+| Owner dashboard | ![Owner](docs/screenshots/27-owner-dashboard.png) |
+| Add vehicle | ![Add](docs/screenshots/28-add-vehicle.png) |
+| Booking requests | ![Requests](docs/screenshots/30-booking-requests.png) |
 
 ## Demo accounts
 

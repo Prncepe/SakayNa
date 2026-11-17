@@ -65,12 +65,46 @@ All live data (accounts, vehicles, bookings, chat, and notifications) is stored 
 
 ## Screenshots
 
-Clear screenshots of the running SwiftUI app are in `docs/screenshots/`:
+Full feature set captured from the running SwiftUI simulator (`docs/screenshots/`):
 
-1. **Welcome** — brand intro and get-started slide  
-2. **Login** — phone/password auth, renter vs owner role  
-3. **Owner dashboard** — earnings, listed vehicles, add vehicle  
-4. **Renter home** — search, dates, city/type filters, vehicle cards  
+| # | File | Feature |
+|---|---|---|
+| 01 | `01-welcome.png` | Welcome / brand intro |
+| 02 | `02-login.png` | Login (phone + role) |
+| 03 | `03-signup.png` | Create account + Terms |
+| 04 | `04-renter-home.png` | Renter home browse |
+| 05 | `05-all-vehicles.png` | All vehicles / filters |
+| 06 | `06-vehicle-detail.png` | Vehicle detail + gallery |
+| 07 | `07-booking.png` | Booking form + payment choice |
+| 08 | `08-payment.png` | Payment / proof flow |
+| 09 | `09-confirmation.png` | Booking confirmation |
+| 10 | `10-my-bookings.png` | My bookings list |
+| 11 | `11-trip-tracking.png` | Trip tracking timeline |
+| 12 | `12-receipt.png` | Receipt / PDF |
+| 13 | `13-rate-trip.png` | Rate trip |
+| 14 | `14-messages.png` | Messages inbox |
+| 15 | `15-chat.png` | Chat thread |
+| 16 | `16-notifications.png` | In-app notifications |
+| 17 | `17-profile-renter.png` | Renter profile |
+| 18 | `18-edit-profile.png` | Edit profile |
+| 19 | `19-payment-methods.png` | Payment methods |
+| 20 | `20-license-upload.png` | License / ID upload |
+| 21 | `21-saved-vehicles.png` | Saved / favorites |
+| 22 | `22-notification-settings.png` | Notification settings |
+| 23 | `23-help.png` | Help |
+| 24 | `24-terms.png` | Terms of use |
+| 25 | `25-privacy.png` | Privacy policy |
+| 26 | `26-about.png` | About |
+| 27 | `27-owner-dashboard.png` | Owner dashboard |
+| 28 | `28-add-vehicle.png` | Add vehicle |
+| 29 | `29-edit-vehicle.png` | Edit vehicle |
+| 30 | `30-booking-requests.png` | Booking requests |
+| 31 | `31-owner-messages.png` | Owner messages |
+| 32 | `32-owner-chat.png` | Owner chat |
+| 33 | `33-owner-profile.png` | Owner profile |
+| 34 | `34-verify-account.png` | Owner verification |
+| 35 | `35-owner-payout.png` | Payout methods |
+| 36 | `36-owner-notifications.png` | Owner notifications |
 
 ## Source code
 

@@ -143,9 +143,16 @@ struct OwnerTabView: View {
             case .chat:
                 bookings.selectedTab = .messages
                 messagesPath.append(route)
-            case .tripTracking:
+            case .tripTracking, .rateTrip, .receipt:
                 bookings.selectedTab = .bookings
                 requestsPath.append(route)
+            case .addVehicle:
+                bookings.selectedTab = .home
+                dashboardPath.append(route)
+            case .editProfile, .paymentMethods, .helpSupport, .notificationSettings,
+                    .termsAndConditions, .privacyPolicy, .about, .verifyAccount:
+                bookings.selectedTab = .profile
+                profilePath.append(route)
             default:
                 break
             }

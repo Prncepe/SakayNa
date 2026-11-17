@@ -32,6 +32,10 @@ struct SakayNaApp: App {
                     NavigationStack {
                         WelcomeView()
                     }
+                } else if auth.authScreen == .signup {
+                    NavigationStack {
+                        SignupView()
+                    }
                 } else {
                     NavigationStack {
                         LoginView()

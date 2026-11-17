@@ -191,9 +191,16 @@ struct MainTabView: View {
             case .chat:
                 bookings.selectedTab = .messages
                 messagesPath.append(route)
-            case .tripTracking:
+            case .tripTracking, .rateTrip, .receipt:
                 bookings.selectedTab = .bookings
                 bookingsPath.append(route)
+            case .allVehicles, .vehicleDetail, .booking, .payment, .confirmation, .licenseUpload:
+                bookings.selectedTab = .home
+                homePath.append(route)
+            case .editProfile, .paymentMethods, .helpSupport, .notificationSettings,
+                    .termsAndConditions, .privacyPolicy, .savedVehicles, .about, .verifyAccount:
+                bookings.selectedTab = .profile
+                profilePath.append(route)
             default:
                 break
             }
